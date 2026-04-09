@@ -1,0 +1,39 @@
+<div class="p-4">
+  <input type="text"
+         [value]="searchTerm()"
+         (input)="onSearch($event)"
+         placeholder="Buscar por nombre..."
+         class="border p-2 mb-4 w-full">
+
+  <table class="w-full border text-left">
+    <thead>
+      <tr class="bg-gray-100">
+        <th class="p-2">ID</th>
+        <th class="p-2">Nombre</th>
+        <th class="p-2">Fecha</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of paginatedItems(); track item.id) {
+        <tr class="border-b">
+          <td class="p-2">{{ item.id }}</td>
+          <td class="p-2">{{ item.name }}</td>
+          <td class="p-2">{{ item.createdAt | date:'short' }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  <div class="mt-4 flex gap-2 items-center justify-center">
+    <button (click)="onPrevPage()"
+            [disabled]="page() === 1"
+            class="border p-2 bg-gray-50 hover:bg-gray-200 disabled:opacity-50">
+      Anterior
+    </button>
+
+    <span class="font-bold">Página {{ page() }}</span>
+
+    <button (click)="onPrevPage()" [disabled]="page() === 1">Anterior</button>
+<button (click)="onNextPage()" [disabled]="(page() * pageSize) >= filteredItems().length">Siguiente</button>
+  </div>
+</div>
