@@ -1,0 +1,69 @@
+<div class="p-6 max-w-4xl mx-auto">
+  <h2 class="text-2xl font-bold mb-4 text-gray-800">Listado de Productos</h2>
+
+  <div class="mb-6">
+    <input
+      type="text"
+      (input)="onSearch($event)"
+      placeholder="🔍 Buscar por nombre..."
+      class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+    >
+  </div>
+
+  <div class="overflow-x-auto bg-white rounded-lg shadow">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="bg-gray-100 border-b">
+          <th class="p-4 font-semibold text-gray-700">ID</th>
+          <th class="p-4 font-semibold text-gray-700">Nombre</th>
+          <th class="p-4 font-semibold text-gray-700">Fecha de Creación</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of paginatedItems(); track item.id) {
+          <tr class="border-b hover:bg-gray-50 transition-colors">
+            <td class="p-4 text-gray-600">{{ item.id }}</td>
+            <td class="p-4 font-medium text-gray-800">{{ item.name }}</td>
+            <td class="p-4 text-gray-500">{{ item.createdAt | date:'mediumDate' }}</td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="3" class="p-8 text-center text-gray-400">
+              No se encontraron productos que coincidan con la búsqueda.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <p class="text-sm text-gray-600">
+      Mostrando items del <b>{{ (page() - 1) * pageSize + 1 }}</b> al
+      <b>{{ (page() * pageSize) > filteredItems().length ? filteredItems().length : (page() * pageSize) }}</b>
+      de un total de <b>{{ filteredItems().length }}</b>
+    </p>
+
+    <div class="inline-flex shadow-sm rounded-md" role="group">
+      <button
+        (click)="page.set(page() - 1)"
+        [disabled]="page() === 1"
+        class="px-4 py-2 text-sm font-medium bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Anterior
+      </button>
+
+      <div class="px-4 py-2 text-sm font-semibold bg-blue-50 border-t border-b border-gray-200 text-blue-600">
+        Página {{ page() }}
+      </div>
+
+      <button
+        (click)="page.set(page() + 1)"
+        [disabled]="(page() * pageSize) >= filteredItems().length"
+        class="px-4 py-2 text-sm font-medium bg-white border border-gray-200 rounded-r-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Siguiente
+      </button>
+    </div>
+  </div>
+</div>
