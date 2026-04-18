@@ -1,0 +1,23 @@
+<div class="container mt-5 text-center">
+  <div class="card p-5 shadow-sm">
+
+    <div *ngIf="status === 'loading'">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="mt-2 text-muted">Conectando con el servidor...</p>
+    </div>
+
+    <div *ngIf="status === 'error'" class="alert alert-danger">
+      <h4>⚠️ Error de Conexión</h4>
+      <p>No se pudieron cargar los datos del Oasis.</p>
+      <button class="btn btn-danger" (click)="status = 'success'">Reintentar</button>
+    </div>
+
+    <div *ngIf="status === 'success'">
+      <h2 class="text-success">✅ Sistema en Línea</h2>
+      <p>Prueba los estados de error y carga para asegurar tus puntos de UX.</p>
+      <button class="btn btn-warning me-2" (click)="simularCarga()">Probar Loading</button>
+      <button class="btn btn-outline-danger" (click)="simularError()">Probar Error</button>
+    </div>
+
+  </div>
+</div>
