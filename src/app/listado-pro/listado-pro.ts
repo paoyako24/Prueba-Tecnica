@@ -13,52 +13,58 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 export class ListadoProComponent implements OnInit {
   searchControl = new FormControl('');
 
-  // Tu lista de productos (puedes agregar más para probar la paginación)
-  productos = [
-    { id: 1, nombre: 'Café Americano', precio: 45, categoria: 'Bebidas' },
-    { id: 2, nombre: 'Croissant Nutella', precio: 35, categoria: 'Panadería' },
-    { id: 3, nombre: 'Muffin Chocolate', precio: 30, categoria: 'Postres' },
-    { id: 4, nombre: 'Té Matcha', precio: 40, categoria: 'Bebidas' },
-    { id: 5, nombre: 'Bagel con Queso', precio: 55, categoria: 'Salados' },
-    { id: 6, nombre: 'Capuchino Vainilla', precio: 50, categoria: 'Bebidas' },
-    { id: 7, nombre: 'Galleta de Avena', precio: 20, categoria: 'Postres' }
+  // Variable de estado para UX (Requisito Eje 5)
+  status: 'loading' | 'error' | 'empty' | 'success' = 'loading';
+
+  productosBase = [
+    { id: 1, nombre: 'Café Americano', precio: 45 },
+    { id: 2, nombre: 'Croissant Nutella', precio: 35 },
+    { id: 3, nombre: 'Muffin Chocolate', precio: 30 },
+    { id: 4, nombre: 'Té Matcha', precio: 40 },
+    { id: 5, nombre: 'Bagel con Queso', precio: 55 }
   ];
 
-  productosFiltrados = [...this.productos];
-
-  // Configuración de Paginación
-  paginaActual: number = 1;
-  itemsPorPagina: number = 3; // Mostraremos de 3 en 3
+  productosFiltrados: any[] = [];
 
   ngOnInit() {
+    this.cargarDatosIniciales();
+
+    // Buscador Pro con RxJS (Requisito Eje 3)
     this.searchControl.valueChanges.pipe(
-      debounceTime(400),
+      debounceTime(500),
       distinctUntilChanged()
     ).subscribe(valor => {
-      this.filtrar(valor || '');
-      this.paginaActual = 1; // Volver a la pág 1 cuando buscamos
+      this.ejecutarBusqueda(valor || '');
     });
   }
 
-  filtrar(termino: string) {
-    const t = termino.toLowerCase();
-    this.productosFiltrados = this.productos.filter(p =>
-      p.nombre.toLowerCase().includes(t) || p.categoria.toLowerCase().includes(t)
-    );
+  cargarDatosIniciales() {
+    this.status = 'loading';
+    setTimeout(() => {
+      // Simulación de éxito
+      this.productosFiltrados = [...this.productosBase];
+      this.status = 'success';
+
+      // Nota: Si quisieras probar el estado de 'error',
+      // podrías cambiar a: this.status = 'error';
+    }, 1500);
   }
 
-  // Lógica para mostrar solo los de la página actual
-  get productosPaginados() {
-    const inicio = (this.paginaActual - 1) * this.itemsPorPagina;
-    const fin = inicio + this.itemsPorPagina;
-    return this.productosFiltrados.slice(inicio, fin);
-  }
+  ejecutarBusqueda(termino: string) {
+    this.status = 'loading';
 
-  get totalPaginas() {
-    return Math.ceil(this.productosFiltrados.length / this.itemsPorPagina);
-  }
+    setTimeout(() => {
+      const t = termino.toLowerCase();
+      this.productosFiltrados = this.productosBase.filter(p =>
+        p.nombre.toLowerCase().includes(t)
+      );
 
-  ordenarAZ() {
-    this.productosFiltrados.sort((a, b) => a.nombre.localeCompare(b.nombre));
+      // Manejo de estado EMPTY (Requisito Eje 5)
+      if (this.productosFiltrados.length === 0) {
+        this.status = 'empty';
+      } else {
+        this.status = 'success';
+      }
+    }, 600);
   }
 }
