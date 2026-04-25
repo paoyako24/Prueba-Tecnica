@@ -2,6 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+// Borramos el import que fallaba y dejamos solo el del servicio
+import { ItemsService } from '../features/items/services/items.service';
+
+// 1. Definimos la Interface aquí mismo (Esto quita el error de "not found")
+export interface Producto {
+  id: number;
+  nombre: string;
+  precio: number;
+}
 
 @Component({
   selector: 'app-listado-pro',
@@ -10,13 +19,12 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
   templateUrl: './listado-pro.html',
   styleUrls: ['./listado-pro.css']
 })
-export class ListadoProComponent implements OnInit {
+export class ListadoPro implements OnInit {
   searchControl = new FormControl('');
-
-  // Variable de estado para UX (Requisito Eje 5)
   status: 'loading' | 'error' | 'empty' | 'success' = 'loading';
 
-  productosBase = [
+  // Usamos la interface que definimos arriba
+  productosBase: Producto[] = [
     { id: 1, nombre: 'Café Americano', precio: 45 },
     { id: 2, nombre: 'Croissant Nutella', precio: 35 },
     { id: 3, nombre: 'Muffin Chocolate', precio: 30 },
@@ -24,12 +32,15 @@ export class ListadoProComponent implements OnInit {
     { id: 5, nombre: 'Bagel con Queso', precio: 55 }
   ];
 
-  productosFiltrados: any[] = [];
+  productosFiltrados: Producto[] = [];
+
+  constructor(private itemsService: ItemsService) {}
 
   ngOnInit() {
-    this.cargarDatosIniciales();
+    // Inicializamos con los datos locales para que no dependa de la API si falla
+    this.productosFiltrados = [...this.productosBase];
+    this.status = 'success';
 
-    // Buscador Pro con RxJS (Requisito Eje 3)
     this.searchControl.valueChanges.pipe(
       debounceTime(500),
       distinctUntilChanged()
@@ -38,33 +49,12 @@ export class ListadoProComponent implements OnInit {
     });
   }
 
-  cargarDatosIniciales() {
-    this.status = 'loading';
-    setTimeout(() => {
-      // Simulación de éxito
-      this.productosFiltrados = [...this.productosBase];
-      this.status = 'success';
-
-      // Nota: Si quisieras probar el estado de 'error',
-      // podrías cambiar a: this.status = 'error';
-    }, 1500);
-  }
-
   ejecutarBusqueda(termino: string) {
-    this.status = 'loading';
+    const t = termino.toLowerCase().trim();
+    this.productosFiltrados = t
+      ? this.productosBase.filter(p => p.nombre.toLowerCase().includes(t))
+      : [...this.productosBase];
 
-    setTimeout(() => {
-      const t = termino.toLowerCase();
-      this.productosFiltrados = this.productosBase.filter(p =>
-        p.nombre.toLowerCase().includes(t)
-      );
-
-      // Manejo de estado EMPTY (Requisito Eje 5)
-      if (this.productosFiltrados.length === 0) {
-        this.status = 'empty';
-      } else {
-        this.status = 'success';
-      }
-    }, 600);
+    this.status = this.productosFiltrados.length > 0 ? 'success' : 'empty';
   }
 }
