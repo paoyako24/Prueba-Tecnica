@@ -10,7 +10,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
   templateUrl: './listado-pro.html',
   styleUrls: ['./listado-pro.css']
 })
-export class ListadoProComponent implements OnInit {
+export class ListadoPro implements OnInit {
   searchControl = new FormControl('');
 
   // Variable de estado para UX (Requisito Eje 5)

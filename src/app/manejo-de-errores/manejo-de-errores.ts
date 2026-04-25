@@ -9,12 +9,14 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./manejo-de-errores.css']
 })
 export class ManejoDeErrores {
-  // Estados requeridos: loading, error, success
+  // Estado inicial (Requisito Ejercicio 5)
   status: 'loading' | 'error' | 'success' = 'success';
 
   simularCarga() {
     this.status = 'loading';
-    setTimeout(() => { this.status = 'success'; }, 2000);
+    setTimeout(() => {
+      this.status = 'success';
+    }, 2000);
   }
 
   simularError() {
