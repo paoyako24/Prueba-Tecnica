@@ -1,45 +1,64 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ItemsService } from '../services/items.service';
-import { Item } from '../models/items.model';
+import { Producto } from '../../../models/producto.models'; // Tu modelo real
 
 @Component({
   selector: 'app-items',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './items.component.html',
-  styleUrl: './items.component.css'
+  styleUrls: ['./items.component.css']
 })
 export class ItemsComponent implements OnInit {
-  private itemsService = inject(ItemsService); // Inyectamos el servicio
+  searchControl = new FormControl('');
+  status: 'loading' | 'error' | 'empty' | 'success' = 'loading';
 
-  items = signal<Item[]>([]); // Lista principal
-  searchQuery = signal('');   // Para el buscador
-  page = signal(1);           // Para la paginación
-  pageSize = 5;
+  items = signal<Producto[]>([]); // CORRECCIÓN: Quitamos Item que rompía la build
+  searchTerm = signal<string>('');
+  page = signal<number>(1);
+  pageSize = signal<number>(10);
+
+  constructor(private itemsService: ItemsService) {}
 
   ngOnInit() {
-    this.loadItems();
+    this.cargarDatos();
+
+    this.searchControl.valueChanges.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(valor => {
+      this.searchTerm.set(valor || '');
+      this.page.set(1);
+    });
   }
 
-  loadItems() {
-    this.items.set(this.itemsService.getAll()); // Traemos los datos del servicio
+  cargarDatos() {
+    this.status = 'loading';
+    this.itemsService.getAll().subscribe({
+      next: (datos: Producto[]) => {
+        this.items.set(datos);
+        this.status = datos.length > 0 ? 'success' : 'empty';
+      },
+      error: (err) => {
+        console.error(err);
+        this.status = 'error';
+      }
+    });
   }
 
   filteredItems = computed(() => {
-    return this.items().filter(item =>
-      item.name.toLowerCase().includes(this.searchQuery().toLowerCase())
-    );
+    const termino = this.searchTerm().toLowerCase().trim();
+    const lista = this.items();
+    if (!termino) return lista;
+    return lista.filter(item => item.name?.toLowerCase().includes(termino));
   });
 
   paginatedItems = computed(() => {
-    const start = (this.page() - 1) * this.pageSize;
-    return this.filteredItems().slice(start, start + this.pageSize);
+    const inicio = (this.page() - 1) * this.pageSize();
+    const fin = inicio + this.pageSize();
+    return this.filteredItems().slice(inicio, fin);
   });
-
-  onSearch(event: Event) {
-    const value = (event.target as HTMLInputElement).value;
-    this.searchQuery.set(value);
-    this.page.set(1);
-  }
 }
