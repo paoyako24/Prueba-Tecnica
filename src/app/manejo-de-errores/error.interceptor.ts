@@ -4,8 +4,8 @@ import { catchError, throwError } from 'rxjs';
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((error) => {
-      // Requisito Ejercicio 6: Manejo centralizado
-      console.error('Error detectado globalmente:', error);
+      // Requisito 6: Manejo centralizado
+      console.error('Error detectado por el interceptor global:', error);
       return throwError(() => error);
     })
   );
