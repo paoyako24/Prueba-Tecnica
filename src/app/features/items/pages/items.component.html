@@ -1,34 +1,43 @@
-<div class="p-6 max-w-4xl mx-auto">
-  <h2 class="text-2xl font-bold mb-4 text-gray-800">Listado de Productos</h2>
+<div class="p-6 max-w-7xl mx-auto bg-gray-50 min-h-screen">
 
   <div class="mb-6">
     <input
+      [formControl]="searchControl"
       type="text"
-      (input)="onSearch($event)"
-      placeholder="🔍 Buscar por nombre..."
-      class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-    >
+      placeholder="Escribe el nombre de un producto para filtrar automáticamente..."
+      class="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+    <p class="text-xs text-gray-500 mt-1">Escribe el nombre de un producto para filtrar la lista automáticamente o presiona Enter.</p>
   </div>
 
-  <div class="overflow-x-auto bg-white rounded-lg shadow">
-    <table class="w-full text-left border-collapse">
-      <thead>
-        <tr class="bg-gray-100 border-b">
-          <th class="p-4 font-semibold text-gray-700">ID</th>
-          <th class="p-4 font-semibold text-gray-700">Nombre</th>
-          <th class="p-4 font-semibold text-gray-700">Fecha de Creación</th>
+  <div class="overflow-x-auto bg-white rounded-xl shadow-md border border-gray-200">
+    <table class="min-w-full divide-y divide-gray-200 text-left">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="px-6 py-4 text-sm font-semibold text-gray-700">ID</th>
+          <th class="px-6 py-4 text-sm font-semibold text-gray-700">Nombre</th>
+          <th class="px-6 py-4 text-sm font-semibold text-gray-700">Precio / Detalles</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="divide-y divide-gray-200 bg-white">
         @for (item of paginatedItems(); track item.id) {
-          <tr class="border-b hover:bg-gray-50 transition-colors">
-            <td class="p-4 text-gray-600">{{ item.id }}</td>
-            <td class="p-4 font-medium text-gray-800">{{ item.name }}</td>
-            <td class="p-4 text-gray-500">{{ item.createdAt | date:'mediumDate' }}</td>
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4 text-sm font-mono text-gray-600">{{ item.id }}</td>
+            <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ item.name }}</td>
+            <td class="px-6 py-4 text-sm text-gray-600">
+              @if (item.data) {
+                <span>Precio: ${{ item.data['price'] || item.data['Price'] || 'N/A' }}</span>
+                @if (item.data['color']) {
+                  <span class="text-xs bg-gray-200 px-2 py-1 rounded ml-2">{{ item.data['color'] }}</span>
+                }
+              } @else {
+                <span class="text-gray-400 italic">Sin detalles</span>
+              }
+            </td>
           </tr>
         } @empty {
           <tr>
-            <td colspan="3" class="p-8 text-center text-gray-400">
+            <td colspan="3" class="px-6 py-8 text-center text-sm text-gray-500">
               No se encontraron productos que coincidan con la búsqueda.
             </td>
           </tr>
@@ -37,33 +46,34 @@
     </table>
   </div>
 
-  <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+  <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-200 pt-4">
     <p class="text-sm text-gray-600">
-      Mostrando items del <b>{{ (page() - 1) * pageSize + 1 }}</b> al
-      <b>{{ (page() * pageSize) > filteredItems().length ? filteredItems().length : (page() * pageSize) }}</b>
-      de un total de <b>{{ filteredItems().length }}</b>
+      Mostrando items del <b class="text-gray-900">{{ (page() - 1) * pageSize() + 1 }}</b> al
+      <b class="text-gray-900">{{ (page() * pageSize()) > filteredItems().length ? filteredItems().length : (page() * pageSize()) }}</b>
+      de un total de <b class="text-gray-900">{{ filteredItems().length }}</b>
     </p>
 
     <div class="inline-flex shadow-sm rounded-md" role="group">
       <button
         (click)="page.set(page() - 1)"
         [disabled]="page() === 1"
-        class="px-4 py-2 text-sm font-medium bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="px-4 py-2 text-sm font-medium bg-white border border-gray-300 rounded-l-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         Anterior
       </button>
 
-      <div class="px-4 py-2 text-sm font-semibold bg-blue-50 border-t border-b border-gray-200 text-blue-600">
+      <div class="px-4 py-2 text-sm font-semibold bg-blue-50 border-t border-b border-gray-300 text-blue-600 flex items-center">
         Página {{ page() }}
       </div>
 
       <button
         (click)="page.set(page() + 1)"
-        [disabled]="(page() * pageSize) >= filteredItems().length"
-        class="px-4 py-2 text-sm font-medium bg-white border border-gray-200 rounded-r-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        [disabled]="(page() * pageSize()) >= filteredItems().length"
+        class="px-4 py-2 text-sm font-medium bg-white border border-gray-300 rounded-r-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         Siguiente
       </button>
     </div>
   </div>
+
 </div>

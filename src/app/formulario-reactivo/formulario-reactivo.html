@@ -1,1 +1,23 @@
-<p>formulario-reactivo works!</p>
+<div class="container mt-4">
+  <h3>Formulario (Alta / Edición)</h3>
+
+  <form [formGroup]="miFormulario" (ngSubmit)="guardar()">
+    <div class="mb-3">
+      <label class="form-label">Nombre del Item:</label>
+      <input type="text" formControlName="name" class="form-control" placeholder="Ej. Producto A">
+
+      <div *ngIf="miFormulario.get('name')?.invalid && miFormulario.get('name')?.touched" class="text-danger">
+        El nombre es obligatorio y debe tener al menos 3 caracteres.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Data (Opcional - JSON):</label>
+      <textarea formControlName="data" class="form-control" rows="3" placeholder='{"key": "value"}'></textarea>
+    </div>
+
+    <button type="submit" [disabled]="miFormulario.invalid" class="btn btn-primary">
+      Guardar Item
+    </button>
+  </form>
+</div>

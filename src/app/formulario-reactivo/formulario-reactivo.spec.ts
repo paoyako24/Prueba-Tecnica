@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormularioReactivoComponent } from './formulario-reactivo';
+import { ReactiveFormsModule } from '@angular/forms';
 
-import { FormularioReactivo } from './formulario-reactivo';
-
-describe('FormularioReactivo', () => {
-  let component: FormularioReactivo;
-  let fixture: ComponentFixture<FormularioReactivo>;
+describe('FormularioReactivoComponent', () => {
+  let component: FormularioReactivoComponent;
+  let fixture: ComponentFixture<FormularioReactivoComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FormularioReactivo]
+      imports: [FormularioReactivoComponent, ReactiveFormsModule]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(FormularioReactivo);
+    fixture = TestBed.createComponent(FormularioReactivoComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
